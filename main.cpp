@@ -32,13 +32,32 @@ void printInputErrorMessage() {
     std::cout << "Wrong input!" << std::endl;
 }
 
+bool chooseAndCheckCell(char cell) {
+
+}
+
+
+void chooseCell(int player) {
+    std::cout << "Choose a cell for "
+              << (player == 1 ? "X" : "O")
+              << "!\n"
+              << "[1-9]"
+              << std::endl;
+    char in;
+
+    while (std::cin >> in) {
+        if (chooseAndCheckCell(in))
+            return;
+    }
+}
+
 void playNewGame() {
 
 }
 
 int main() {
     char in;
-    int state[3][3] {{0, 0, 0},
+    int state[3][3]{{0, 0, 0},
                     {0, 0, 0},
                     {0, 0, 0}};
 
@@ -57,7 +76,7 @@ int main() {
             case '3':
                 exit(0);
             default:
-               printInputErrorMessage();
+                printInputErrorMessage();
         }
         printMainMenu();
     }
