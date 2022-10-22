@@ -21,6 +21,13 @@ void printAbout() {
               << std::endl;
 }
 
+void printWinner(int player) {
+    std::cout << "Player "
+              << (player == 1 ? "X" : "O")
+              << " has won!"
+              << std::endl;
+}
+
 void printInputErrorMessage() {
     std::cout << "Wrong input!" << std::endl;
 }
