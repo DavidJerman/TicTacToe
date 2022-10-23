@@ -50,6 +50,12 @@ int checkGameState(int state[3][3]) {
     return 0;
 }
 
+void resetGameBoard(int board[3][3]) {
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            board[i][j] = 0;
+}
+
 int main() {
     std::cout << "Hello, World!" << std::endl;
     return 0;
