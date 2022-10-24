@@ -32,11 +32,15 @@ void printInputErrorMessage() {
     std::cout << "Wrong input!" << std::endl;
 }
 
-bool chooseAndCheckCell(char cell) {
-
+bool chooseAndCheckCell(int gameBoard[3][3], char cell, int player) {
+    int i = (cell - 1) / 3;
+    int j = (cell - 1) % 3;
+    if (gameBoard[i][j]) return false;
+    else gameBoard[i][j] = player;
+    return true;
 }
 
-void chooseCell(int player) {
+void chooseCell(int gameBoard[3][3], int player) {
     std::cout << "Choose a cell for "
               << (player == 1 ? "X" : "O")
               << "!\n"
@@ -45,20 +49,18 @@ void chooseCell(int player) {
     char in;
 
     while (std::cin >> in) {
-        if (chooseAndCheckCell(in))
+        if (chooseAndCheckCell(gameBoard, in - 48, player))
             return;
+        std::cout << "Invalid cell!" << std::endl;
     }
 }
 
-void playNewGame() {
-
-}
-
-void printGameBoard(int board[3][3]) {
+void printGameBoard(int gameBoard[3][3]) {
     std::cout << "==============================" << std::endl;
     for (int i = 0; i < 3; i++) {
+        std::cout << " ";
         for (int j = 0; j < 3; j++) {
-            std::cout << (board[i][j] == 2 ? "O" : (board[i][j] == 1 ? "X" : " "))
+            std::cout << (gameBoard[i][j] == 2 ? "O" : (gameBoard[i][j] == 1 ? "X" : "*"))
                       << " ";
         }
         std::cout << std::endl;
@@ -69,63 +71,92 @@ void printGameBoard(int board[3][3]) {
 //  0 / game still in progress
 //  1 / X won
 //  2 / O won
-bool checkIsFull(int state[3][3]) {
+bool checkIsFull(int gameBoard[3][3]) {
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
-            if (state[i][j] == 0)
+            if (gameBoard[i][j] == 0)
                 return false;
     return true;
 }
 
-int checkRows(int state[3][3]) {
+int checkRows(int gameBoard[3][3]) {
     for (int i = 0; i < 3; i++) {
-        if (state[i][0] == state[i][1] && state[i][2] != 0)
-            return state[i][0];
+        if (gameBoard[i][0] == gameBoard[i][1] &&
+            gameBoard[i][1] == gameBoard[i][2] &&
+            gameBoard[i][2] != 0)
+            return gameBoard[i][0];
     }
     return 0;
 }
 
-int checkColumns(int state[3][3]) {
+int checkColumns(int gameBoard[3][3]) {
     for (int i = 0; i < 3; i++) {
-        if (state[0][i] == state[1][i] && state[2][i] != 0)
-            return state[0][i];
+        if (gameBoard[0][i] == gameBoard[1][i] &&
+            gameBoard[1][i] == gameBoard[2][i] &&
+            gameBoard[2][i] != 0)
+            return gameBoard[0][i];
     }
     return 0;
 }
 
-int checkDiagonals(int state[3][3]) {
-    if (state[0][0] == state[1][1] == state[2][2] != 0)
-        return state[0][0];
-    if (state[0][2] == state[1][1] == state[2][0] != 0)
-        return state[0][2];
+int checkDiagonals(int gameBoard[3][3]) {
+    if (gameBoard[0][0] == gameBoard[1][1] &&
+        gameBoard[1][1] == gameBoard[2][2] &&
+        gameBoard[2][2] != 0)
+        return gameBoard[0][0];
+    if (gameBoard[0][2] == gameBoard[1][1] &&
+        gameBoard[1][1] == gameBoard[2][0] &&
+        gameBoard[2][0] != 0)
+        return gameBoard[0][2];
     return 0;
 }
 
-int checkGameState(int state[3][3]) {
-    auto winner = checkRows(state);
+int checkGameState(int gameBoard[3][3]) {
+    auto winner = checkRows(gameBoard);
     if (winner > 0)
         return winner;
-    winner = checkColumns(state);
+    winner = checkColumns(gameBoard);
     if (winner > 0)
         return winner;
-    winner = checkDiagonals(state);
+    winner = checkDiagonals(gameBoard);
     if (winner > 0)
         return winner;
-    if (checkIsFull(state)) return -1;
+    if (checkIsFull(gameBoard)) return -1;
     return 0;
 }
 
-void resetGameBoard(int board[3][3]) {
+void resetGameBoard(int gameBoard[3][3]) {
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
-            board[i][j] = 0;
+            gameBoard[i][j] = 0;
+}
+
+void playNewGame(int gameBoard[3][3]) {
+    int player = 1;
+
+    resetGameBoard(gameBoard);
+
+    while (true) {
+        printGameBoard(gameBoard);
+        chooseCell(gameBoard, player);
+        if (player == 1) player = 2;
+        else player = 1;
+        auto res = checkGameState(gameBoard);
+        if (res == -1) {
+            std::cout << "Game Over! No winner!" << std::endl;
+            return;
+        }
+        if (res == 0) continue;
+        printWinner(res);
+        return;
+    }
 }
 
 int main() {
     char in;
-    int state[3][3]{{0, 0, 0},
-                    {0, 0, 0},
-                    {0, 0, 0}};
+    int gameBoard[3][3]{{0, 0, 0},
+                        {0, 0, 0},
+                        {0, 0, 0}};
 
     greetUser();
     printMainMenu();
@@ -134,7 +165,7 @@ int main() {
     while (std::cin >> in) {
         switch (in) {
             case '1':
-                playNewGame();
+                playNewGame(gameBoard);
                 break;
             case '2':
                 printAbout();
